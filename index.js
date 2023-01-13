@@ -1,17 +1,38 @@
+/**
+ * Function to format and send response
+ * @param {*} res
+ * @param {*} code
+ * @param {*} data
+ * @param {*} type
+ */
+const sendResponse = (res, code, data, type = "application/json") => {
+  const headers = {
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Methods": "GET, POST, OPTIONS, PUT, DELETE",
+    "Content-Type": type,
+  };
+  console.log("END:", data, code);
 
+  res.writeHead(code, headers);
+  res.write(JSON.stringify(data));
+  res.end();
+};
 
-const password_recovery_util_fn = async (req, res) => {
-
-  // health check
-  if (req.params["health"] === "health") {
-    res.write(JSON.stringify({success: true, msg: "Health check success"}))
-    res.end()
+/**
+ * Function to extract the body from the request
+ * @param {*} req
+ * @returns
+ */
+const getBody = async (req) => {
+  const bodyBuffer = [];
+  for await (const chunk of req) {
+    bodyBuffer.push(chunk);
   }
+  const data = Buffer.concat(bodyBuffer).toString();
+  return JSON.parse(data || "{}");
+};
 
-  // Add your code here
-  res.write(JSON.stringify({success: true, msg: `Hello password_recovery_util_fn`}))
-  res.end()
-  
-}
-
-export default password_recovery_util_fn
+export default {
+  sendResponse,
+  getBody,
+};
